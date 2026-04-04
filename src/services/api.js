@@ -68,13 +68,18 @@ export async function fetchPremiumReportEIPR(simulationId, teamId, roundNum) {
 /**
  * Fetch Salespeople for a round and team
  */
-export async function fetchSalespeople(simulationId, roundId, teamId) {
+export async function fetchSalespeople(simulationId, roundId, teamId, roundNum) {
   const constraints = [
     { key: 'simulationId', constraint_type: 'equals', value: simulationId },
-    { key: 'roundId', constraint_type: 'equals', value: roundId },
     { key: 'teamCompanyId', constraint_type: 'equals', value: teamId },
     { key: 'employed', constraint_type: 'equals', value: 'true' }
   ];
+
+  if (roundId) {
+    constraints.push({ key: 'roundId', constraint_type: 'equals', value: roundId });
+  } else if (roundNum) {
+    constraints.push({ key: 'roundNum', constraint_type: 'equals', value: roundNum });
+  }
   
   const queryString = buildConstraints(constraints);
   const url = `${API_BASE_URL}/obj/Prod_SalePerson?${queryString}`;
@@ -93,12 +98,17 @@ export async function fetchSalespeople(simulationId, roundId, teamId) {
 /**
  * Fetch Sales Territories for a round and team
  */
-export async function fetchTerritories(simulationId, roundId, teamId) {
+export async function fetchTerritories(simulationId, roundId, teamId, roundNum) {
   const constraints = [
     { key: 'simulationId', constraint_type: 'equals', value: simulationId },
-    { key: 'roundId', constraint_type: 'equals', value: roundId },
     { key: 'teamCompanyId', constraint_type: 'equals', value: teamId }
   ];
+
+  if (roundId) {
+    constraints.push({ key: 'roundId', constraint_type: 'equals', value: roundId });
+  } else if (roundNum) {
+    constraints.push({ key: 'roundNum', constraint_type: 'equals', value: roundNum });
+  }
   
   const queryString = buildConstraints(constraints);
   const url = `${API_BASE_URL}/obj/Prod_SalesTerritory?${queryString}`;
