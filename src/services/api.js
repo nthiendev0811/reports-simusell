@@ -140,3 +140,39 @@ export async function fetchTeamCompany(teamId) {
   
   return data.response;
 }
+
+/**
+ * Fetch any Bubble object by table name and ID
+ */
+export async function fetchBubbleObjectById(tableName, id) {
+  const url = `${API_BASE_URL}/obj/${tableName}/${id}`;
+  
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  
+  return data.response;
+}
+
+export async function fetchBubbleObjectsByIds(tableName, ids = []) {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return [];
+  }
+
+  const results = await Promise.all(
+    ids.map(async (id) => {
+      try {
+        return await fetchBubbleObjectById(tableName, id);
+      } catch (error) {
+        console.warn(`Unable to fetch ${tableName} ${id}:`, error);
+        return null;
+      }
+    })
+  );
+
+  return results.filter(Boolean);
+}

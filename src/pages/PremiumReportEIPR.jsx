@@ -4,6 +4,7 @@ import { formatDate, generateSubject } from '../utils/formatters';
 import CompetitivePerformance from '../components/premium/CompetitivePerformance';
 import SalesContactCard from '../components/premium/SalesContactCard';
 import EmploymentChanges from '../components/premium/EmploymentChanges';
+import SalesForceTable from '../components/premium/SalesForceTable';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 
@@ -17,15 +18,15 @@ export default function PremiumReportEIPR() {
   useEffect(() => {
     async function loadReport() {
       try {
-        const params = new URLSearchParams(window.location.search);
-        const simulationId = params.get('simulationId');
-        const teamId = params.get('teamId');
-        const roundNum = params.get('roundNum');
-        const roundId = params.get('roundId');
+        const DEFAULT_SIMULATION_ID = 'replace-with-simulation-id';
+        const DEFAULT_TEAM_ID = 'replace-with-team-id';
+        const DEFAULT_ROUND_NUM = '1';
 
-        if (!simulationId || !teamId || !roundNum) {
-          throw new Error('Missing required parameters: simulationId, teamId, or roundNum');
-        }
+        const params = new URLSearchParams(window.location.search);
+        const simulationId = params.get('simulationId') || DEFAULT_SIMULATION_ID;
+        const teamId = params.get('teamId') || DEFAULT_TEAM_ID;
+        const roundNum = params.get('roundNum') || DEFAULT_ROUND_NUM;
+        const roundId = params.get('roundId');
 
         // Fetch premium report
         const reportData = await fetchPremiumReportEIPR(simulationId, teamId, roundNum);
@@ -49,85 +50,80 @@ export default function PremiumReportEIPR() {
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage error={error} />;
+  if (!report) return <ErrorMessage error="No report data found" />;
 
   const oldTerritories = report.oldTerritoryIDs || [];
   const newTerritories = report.newTerritoryIDs || [];
+  const territoryNames = territories.map((territory) => territory.name || territory.title || territory._id || 'Unknown');
   const hiredEmployees = salespeople.length > 0
-    ? salespeople.filter(sp => sp.wasHired)
+    ? salespeople.filter((person) => person.wasHired)
     : (report.hiredSalesPeopleIDs || []).map((id) => ({
+        _id: id,
         firstName: 'Hired',
         lastName: id.slice(-6),
         jobTitle: 'Salesperson',
-        _id: id,
       }));
   const terminatedEmployees = salespeople.length > 0
-    ? salespeople.filter(sp => sp.terminateEmployment)
+    ? salespeople.filter((person) => person.terminateEmployment)
     : [];
-  const employedSalesforceCount = report.employedSalesPeopleIDs?.length || 0;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="bg-gray-800 text-white px-8 py-6">
-            <div className="flex justify-between items-center">
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="bg-gray-900 text-white px-8 py-8">
+            <div className="flex flex-col md:flex-row justify-between gap-6">
               <div>
                 <h1 className="text-3xl font-bold">{report.fullName || 'Extended Industry Performance Report'}</h1>
-                <p className="text-gray-300 mt-1">{generateSubject(report.roundNum)}</p>
+                <p className="mt-2 text-gray-300">{generateSubject(report.roundNum)}</p>
               </div>
               <div className="text-right">
-                <div className="text-sm text-gray-300">Report Date</div>
-                <div className="text-lg font-semibold">{formatDate(report['Created Date'])}</div>
+                <div className="text-sm text-gray-400">Report Date</div>
+                <div className="text-2xl font-semibold">{formatDate(report['Created Date'])}</div>
               </div>
             </div>
           </div>
-          
-          {/* Tabs */}
-          <div className="bg-white border-b">
-            <div className="flex">
-              <button className="px-6 py-3 bg-gray-100 font-medium border-b-2 border-blue-600">
-                Standard Reports
-              </button>
-              <button className="px-6 py-3 text-gray-600 font-medium hover:bg-gray-50">
-                Premium Reports
-              </button>
-            </div>
-          </div>
-          
-          {/* Premium Report Menu */}
-          <div className="bg-white p-4 border-b">
-            <div className="relative">
-              <select className="w-64 px-4 py-2 bg-blue-600 text-white rounded font-medium">
-                <option>Extended Industry Performance Report</option>
-                <option>Market Potential Forecast</option>
-                <option>Market Share Report</option>
-                <option>Customer Segment Analysis</option>
-                <option>Human Resources Report</option>
-                <option>Customer Satisfaction Report</option>
-                <option>Territory Analysis</option>
-                <option>Competitive Insights</option>
-                <option>Extended Industry Performance Report</option>
-                <option>Competitive Dominance Report</option>
-                <option>Relative Dominance Report</option>
-                <option>Sales Forecast Report</option>
-              </select>
+          <div className="bg-white border-t px-6 py-4">
+            <div className="flex flex-wrap gap-3">
+              <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">Premium Report</span>
+              <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">Round {report.roundNum || 'N/A'}</span>
+              <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">Team: {report.team || report.teamName || 'Unknown'}</span>
             </div>
           </div>
         </div>
 
-        {/* Competitive Performance */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900">Old Territories</h2>
+            <p className="mt-4 text-sm text-gray-600">{oldTerritories.length} territory IDs</p>
+            <p className="mt-2 text-xs text-gray-500">{territories.length > 0 ? `Fetched ${territories.length} territory records` : 'No territory records fetched'}</p>
+            {territoryNames.length > 0 && (
+              <div className="mt-3 text-xs text-gray-500 space-y-1 break-words">{territoryNames.join(', ')}</div>
+            )}
+            {oldTerritories.length > 0 && (
+              <div className="mt-4 text-xs text-gray-500 space-y-1 break-words">{oldTerritories.join(', ')}</div>
+            )}
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900">New Territories</h2>
+            <p className="mt-4 text-sm text-gray-600">{newTerritories.length} territory IDs</p>
+            <p className="mt-2 text-xs text-gray-500">{territories.length > 0 ? `Fetched ${territories.length} territory records` : 'No territory records fetched'}</p>
+            {newTerritories.length > 0 && (
+              <div className="mt-4 text-xs text-gray-500 space-y-1 break-words">{newTerritories.join(', ')}</div>
+            )}
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900">Sales Force Summary</h2>
+            <p className="mt-4 text-sm text-gray-600">Hired: {hiredEmployees.length}</p>
+            <p className="mt-1 text-sm text-gray-600">Terminated: {terminatedEmployees.length}</p>
+            <p className="mt-1 text-sm text-gray-600">Employed IDs: {report.employedSalesPeopleIDs?.length || 0}</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1 h-8 bg-blue-600 rounded"></div>
             <h2 className="text-2xl font-bold text-gray-900">Competitive Performance</h2>
-          </div>
-          
-          <div className="mb-4">
-            <div className="flex gap-4">
-              <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded font-medium">Last Quarter</button>
-              <button className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Total</button>
-            </div>
           </div>
           {report.competitivePerformance?.length > 0 ? (
             <CompetitivePerformance teams={report.competitivePerformance} />
@@ -138,144 +134,120 @@ export default function PremiumReportEIPR() {
           )}
         </div>
 
-        {/* Sales Territories */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-1 h-8 bg-green-600 rounded"></div>
-            <h2 className="text-2xl font-bold text-gray-900">Sales Territories</h2>
-          </div>
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold mb-3 text-center text-gray-700">Old Territories</h3>
-              <div className="bg-gray-100 rounded-lg p-4 min-h-[300px] flex items-center justify-center border-2 border-gray-200">
-                <div className="text-center">
-                  <svg className="w-full h-48 mx-auto" viewBox="0 0 400 300">
-                    <rect x="50" y="50" width="100" height="80" fill="#8b5cf6" opacity="0.7" />
-                    <rect x="150" y="80" width="80" height="60" fill="#8b5cf6" opacity="0.7" />
-                    <text x="100" y="95" fill="white" fontSize="12" fontWeight="bold">CA</text>
-                    <text x="185" y="115" fill="white" fontSize="12" fontWeight="bold">NV</text>
-                  </svg>
-                  <p className="text-sm text-gray-600 mt-2">US Territory Map</p>
-                  <p className="text-xs text-gray-500 mt-3">Old territory IDs: {oldTerritories.length}</p>
-                  {oldTerritories.length > 0 && (
-                    <p className="text-xs text-gray-500 mt-2 break-words">{oldTerritories.join(', ')}</p>
-                  )}
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold mb-4">Territory Overview</h2>
+            <div className="grid gap-4">
+              <div className="rounded-lg border border-gray-200 p-4 bg-gray-50">
+                <h3 className="font-semibold">Old Territories</h3>
+                <p className="mt-2 text-gray-700">{oldTerritories.length} territories</p>
               </div>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-3 text-center text-gray-700">New Territories</h3>
-              <div className="bg-gray-100 rounded-lg p-4 min-h-[300px] flex items-center justify-center border-2 border-gray-200">
-                <div className="text-center">
-                  <svg className="w-full h-48 mx-auto" viewBox="0 0 400 300">
-                    <rect x="50" y="50" width="100" height="80" fill="#e0e0e0" opacity="0.5" />
-                    <rect x="150" y="80" width="80" height="60" fill="#e0e0e0" opacity="0.5" />
-                    <text x="100" y="95" fill="#999" fontSize="12" fontWeight="bold">CA</text>
-                    <text x="185" y="115" fill="#999" fontSize="12" fontWeight="bold">NV</text>
-                  </svg>
-                  <p className="text-sm text-gray-600 mt-2">US Territory Map</p>
-                  <p className="text-xs text-gray-500 mt-3">New territory IDs: {newTerritories.length}</p>
-                  {newTerritories.length > 0 && (
-                    <p className="text-xs text-gray-500 mt-2 break-words">{newTerritories.join(', ')}</p>
-                  )}
-                </div>
+              <div className="rounded-lg border border-gray-200 p-4 bg-gray-50">
+                <h3 className="font-semibold">New Territories</h3>
+                <p className="mt-2 text-gray-700">{newTerritories.length} territories</p>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Employment Changes */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-1 h-8 bg-purple-600 rounded"></div>
-            <h2 className="text-2xl font-bold text-gray-900">Employment Changes</h2>
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold mb-4">Employment Changes</h2>
+            <EmploymentChanges hired={hiredEmployees} terminated={terminatedEmployees} />
           </div>
-          <EmploymentChanges 
-            hired={hiredEmployees} 
-            terminated={terminatedEmployees} 
-          />
         </div>
 
-        {/* Sales Force */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1 h-8 bg-orange-600 rounded"></div>
             <h2 className="text-2xl font-bold text-gray-900">Sales Force</h2>
           </div>
           {salespeople.length > 0 ? (
-            <>
-              <div className="mb-6 overflow-x-auto">
-                <table className="w-full text-sm border-collapse">
-                  <thead>
-                    <tr className="bg-gray-50 border-b-2 border-gray-200">
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700">Name</th>
-                      <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700">Salary ($)</th>
-                      <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700">Commission (%)</th>
-                      <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700">Quota ($)</th>
-                      <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700">Bonus ($)</th>
-                      <th className="px-3 py-2 text-center text-xs font-semibold text-gray-700">Hours of Supervision</th>
-                      <th className="px-3 py-2 text-center text-xs font-semibold text-gray-700">Recognition</th>
-                      <th className="px-3 py-2 text-center text-xs font-semibold text-gray-700">Promotion</th>
-                      <th className="px-3 py-2 text-center text-xs font-semibold text-gray-700">Training</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {salespeople.map((sp, index) => (
-                      <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="px-3 py-2 text-gray-900">{sp.firstName} {sp.lastName}</td>
-                        <td className="px-3 py-2 text-right text-gray-700">{sp.salary || 0}</td>
-                        <td className="px-3 py-2 text-right text-gray-700">{sp.commissionPercentage || 0}</td>
-                        <td className="px-3 py-2 text-right text-gray-700">{sp.quota || 0}</td>
-                        <td className="px-3 py-2 text-right text-gray-700">{sp.bonus || 0}</td>
-                        <td className="px-3 py-2 text-center text-gray-700">{sp.hoursSupervision || 0}</td>
-                        <td className="px-3 py-2 text-center text-gray-700">{sp.recognition || '-'}</td>
-                        <td className="px-3 py-2 text-center text-gray-700">{sp.givePromotion ? 'Yes' : 'No'}</td>
-                        <td className="px-3 py-2 text-center text-gray-700">{sp.training || '-'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-4 text-gray-900">Sales Contact</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {salespeople.map((sp, index) => (
-                    <SalesContactCard key={index} salesperson={sp} />
-                  ))}
-                </div>
-              </div>
-            </>
+            <SalesForceTable salespeople={salespeople} />
           ) : (
-            <div className="text-center text-gray-600 py-12">
-              {employedSalesforceCount > 0 ? (
+            <div className="text-center text-gray-600 py-10 border border-dashed border-gray-300 rounded-lg">
+              {report.employedSalesPeopleIDs?.length > 0 ? (
                 <>
                   <div className="text-xl font-semibold mb-3">Sales force details not available</div>
-                  <div>{employedSalesforceCount} employed salesperson IDs were returned</div>
-                  <div className="mt-4 text-sm text-gray-500 break-words">
-                    {report.employedSalesPeopleIDs?.join(', ')}
-                  </div>
+                  <div>{report.employedSalesPeopleIDs.length} employed salesperson IDs were returned</div>
+                  <div className="mt-4 text-sm text-gray-500 break-words">{report.employedSalesPeopleIDs.join(', ')}</div>
                 </>
               ) : (
                 <div>No sales force data available for this round.</div>
               )}
             </div>
           )}
+        </div>
 
-        {/* Reports Purchased */}
-
-        {/* Reports Purchased */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-1 h-8 bg-gray-600 rounded"></div>
+            <div className="w-1 h-8 bg-teal-600 rounded"></div>
+            <h2 className="text-2xl font-bold text-gray-900">Sales Contact</h2>
+          </div>
+          {salespeople.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {salespeople.map((sp, index) => (
+                <SalesContactCard key={index} salesperson={sp} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-600 py-10 border border-dashed border-gray-300 rounded-lg">
+              No sales contact available.
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-1 h-8 bg-indigo-600 rounded"></div>
+            <h2 className="text-2xl font-bold text-gray-900">Sales Contest</h2>
+          </div>
+          {report.salesContestID || report.salesContestName ? (
+            <div className="space-y-3 text-sm text-gray-700">
+              {report.salesContestName && (
+                <div>
+                  <span className="font-semibold">Contest:</span> {report.salesContestName}
+                </div>
+              )}
+              {report.salesContestID && (
+                <div>
+                  <span className="font-semibold">Contest ID:</span> {report.salesContestID}
+                </div>
+              )}
+              {report.salesContestWinnerID && (
+                <div>
+                  <span className="font-semibold">Winner ID:</span> {report.salesContestWinnerID}
+                </div>
+              )}
+              {report.salesContestSummary && (
+                <div className="text-gray-600">{report.salesContestSummary}</div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-10 border border-dashed border-gray-300 rounded-lg">
+              No sales contest information is available for this round.
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-1 h-8 bg-gray-700 rounded"></div>
             <h2 className="text-2xl font-bold text-gray-900">Reports Purchased</h2>
           </div>
-          <p className="text-gray-500 text-center py-8 bg-gray-50 rounded">
-            No reports were purchased during this round.
-          </p>
+          {report.reportsPurchasedIDs?.length > 0 ? (
+            <div className="grid gap-3">
+              {report.reportsPurchasedIDs.map((id) => (
+                <div key={id} className="rounded-lg border border-gray-200 p-4 bg-gray-50">
+                  <div className="text-sm text-gray-700">Report ID: {id}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-10 border border-dashed border-gray-300 rounded-lg">
+              No reports were purchased during this round.
+            </div>
+          )}
         </div>
       </div>
-    </div>
     </div>
   );
 }
