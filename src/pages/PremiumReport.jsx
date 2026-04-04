@@ -60,7 +60,7 @@ export default function PremiumReport() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-t-lg px-8 py-6 mb-0">
           <div className="flex justify-between items-center">

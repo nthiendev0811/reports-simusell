@@ -40,7 +40,7 @@ export default function StandardReport() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-5">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="mx-auto bg-white rounded-lg shadow-md overflow-hidden">
         {/* Header */}
         <div className="bg-gray-200 px-10 py-8 flex justify-between items-center border-b border-gray-300">
           <h1 className="text-3xl font-semibold text-gray-900">

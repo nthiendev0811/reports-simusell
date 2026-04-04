@@ -69,7 +69,7 @@ export default function PremiumReportEIPR() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="mx-auto space-y-6">
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="bg-gray-900 text-white px-8 py-8">
             <div className="flex flex-col md:flex-row justify-between gap-6">
