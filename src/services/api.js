@@ -38,6 +38,202 @@ export async function fetchStandardReportMD(simulationId, teamId, roundNum) {
 }
 
 /**
+ * Fetch Standard Report QPLS (Quarterly Profit and Loss Statement)
+ */
+export async function fetchStandardReportQPLS(simulationId, teamId, roundNum) {
+  const constraints = [
+    { key: 'simulationId', constraint_type: 'equals', value: simulationId },
+    { key: 'teamId', constraint_type: 'equals', value: teamId },
+    { key: 'roundNum', constraint_type: 'equals', value: roundNum }
+  ];
+  
+  const queryString = buildConstraints(constraints);
+  const url = `${API_BASE_URL}/obj/Prod_StandardReport_QPLS?${queryString}`;
+  
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error('No standard report QPLS found');
+  }
+  
+  return data.response.results[0];
+}
+
+/**
+ * Fetch Standard Report CRR (Competitive Ranking Report)
+ */
+export async function fetchStandardReportCRR(simulationId, teamId, roundNum) {
+  const constraints = [
+    { key: 'simulationId', constraint_type: 'equals', value: simulationId },
+    { key: 'teamId', constraint_type: 'equals', value: teamId },
+    { key: 'roundNum', constraint_type: 'equals', value: roundNum }
+  ];
+  
+  const queryString = buildConstraints(constraints);
+  const url = `${API_BASE_URL}/obj/Prod_StandardReport_CRR?${queryString}`;
+  
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error('No standard report CRR found');
+  }
+  
+  return data.response.results[0];
+}
+
+/**
+ * Fetch Standard Report IPR (Industry Performance Report)
+ */
+export async function fetchStandardReportIPR(simulationId, teamId, roundNum) {
+  const constraints = [
+    { key: 'simulationId', constraint_type: 'equals', value: simulationId },
+    { key: 'teamId', constraint_type: 'equals', value: teamId },
+    { key: 'roundNum', constraint_type: 'equals', value: roundNum }
+  ];
+  
+  const queryString = buildConstraints(constraints);
+  const url = `${API_BASE_URL}/obj/Prod_StandardReport_IPR?${queryString}`;
+  
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error('No standard report IPR found');
+  }
+  
+  return data.response.results[0];
+}
+
+/**
+ * Fetch Standard Report FAR (Forecast Accuracy Report)
+ */
+export async function fetchStandardReportFAR(simulationId, teamId, roundNum) {
+  const constraints = [
+    { key: 'simulationId', constraint_type: 'equals', value: simulationId },
+    { key: 'teamId', constraint_type: 'equals', value: teamId },
+    { key: 'roundNum', constraint_type: 'equals', value: roundNum }
+  ];
+  
+  const queryString = buildConstraints(constraints);
+  const url = `${API_BASE_URL}/obj/Prod_StandardReport_FAR?${queryString}`;
+  
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error('No standard report FAR found');
+  }
+  
+  return data.response.results[0];
+}
+
+/**
+ * Fetch Standard Report TSR (Team Summary Report)
+ */
+export async function fetchStandardReportTSR(simulationId, teamId, roundNum) {
+  const constraints = [
+    { key: 'simulationId', constraint_type: 'equals', value: simulationId },
+    { key: 'teamId', constraint_type: 'equals', value: teamId },
+    { key: 'roundNum', constraint_type: 'equals', value: roundNum }
+  ];
+  
+  const queryString = buildConstraints(constraints);
+  const url = `${API_BASE_URL}/obj/Prod_StandardReport_TSR?${queryString}`;
+  
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error('No standard report TSR found');
+  }
+  
+  return data.response.results[0];
+}
+
+/**
+ * Fetch Standard Report ISP (Industry Sales Potential)
+ */
+export async function fetchStandardReportISP(simulationId, teamId, roundNum) {
+  const constraints = [
+    { key: 'simulationId', constraint_type: 'equals', value: simulationId },
+    { key: 'teamId', constraint_type: 'equals', value: teamId },
+    { key: 'roundNum', constraint_type: 'equals', value: roundNum }
+  ];
+  
+  const queryString = buildConstraints(constraints);
+  const url = `${API_BASE_URL}/obj/Prod_StandardReport_ISP?${queryString}`;
+  
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error('No standard report ISP found');
+  }
+  
+  return data.response.results[0];
+}
+
+/**
+ * Fetch Standard Report MSA (Market Share Analysis)
+ */
+export async function fetchStandardReportMSA(simulationId, teamId, roundNum) {
+  const constraints = [
+    { key: 'simulationId', constraint_type: 'equals', value: simulationId },
+    { key: 'teamId', constraint_type: 'equals', value: teamId },
+    { key: 'roundNum', constraint_type: 'equals', value: roundNum }
+  ];
+  
+  const queryString = buildConstraints(constraints);
+  const url = `${API_BASE_URL}/obj/Prod_StandardReport_MSA?${queryString}`;
+  
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error('No standard report MSA found');
+  }
+  
+  return data.response.results[0];
+}
+
+/**
  * Fetch Premium Report EIPR (Extended Industry Performance Report)
  */
 export async function fetchPremiumReportEIPR(simulationId, teamId, roundNum) {
@@ -62,6 +258,146 @@ export async function fetchPremiumReportEIPR(simulationId, teamId, roundNum) {
     throw new Error('No premium report EIPR found');
   }
   
+  return data.response.results[0];
+}
+
+/**
+ * Fetch Premium Report MPF (Market Potential Forecast)
+ */
+export async function fetchPremiumReportMPF(simulationId, teamId, roundNum) {
+  const constraints = [
+    { key: 'simulationId', constraint_type: 'equals', value: simulationId },
+    { key: 'teamId', constraint_type: 'equals', value: teamId },
+    { key: 'roundNum', constraint_type: 'equals', value: roundNum }
+  ];
+  
+  const queryString = buildConstraints(constraints);
+  const url = `${API_BASE_URL}/obj/Prod_PremiumReport_MPF?${queryString}`;
+  
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error('No premium report MPF found');
+  }
+  
+  return data.response.results[0];
+}
+
+/**
+ * Fetch any available Premium Report MPF when query params are not present
+ */
+export async function fetchAnyPremiumReportMPF() {
+  const url = `${API_BASE_URL}/obj/Prod_PremiumReport_MPF?limit=1`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error('No premium report MPF available');
+  }
+
+  return data.response.results[0];
+}
+
+/**
+ * Fetch any premium report by table name, using the first matching item.
+ */
+export async function fetchAnyPremiumReportByType(tableName) {
+  const url = `${API_BASE_URL}/obj/${tableName}?limit=1`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error(`No premium report available for ${tableName}`);
+  }
+
+  return data.response.results[0];
+}
+
+/**
+ * Fetch premium report by Bubble table name.
+ */
+export async function fetchPremiumReportByType(tableName, simulationId, teamId, roundNum) {
+  const constraints = [
+    { key: 'simulationId', constraint_type: 'equals', value: simulationId },
+    { key: 'teamId', constraint_type: 'equals', value: teamId },
+    { key: 'roundNum', constraint_type: 'equals', value: roundNum }
+  ];
+
+  const queryString = buildConstraints(constraints);
+  const url = `${API_BASE_URL}/obj/${tableName}?${queryString}`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error(`No premium report found for ${tableName}`);
+  }
+
+  return data.response.results[0];
+}
+
+/**
+ * Fetch Premium Report MSR (Market Share Report)
+ */
+export async function fetchPremiumReportMSR(simulationId, teamId, roundNum) {
+  const constraints = [
+    { key: 'simulationId', constraint_type: 'equals', value: simulationId },
+    { key: 'teamId', constraint_type: 'equals', value: teamId },
+    { key: 'roundNum', constraint_type: 'equals', value: roundNum }
+  ];
+
+  const queryString = buildConstraints(constraints);
+  const url = `${API_BASE_URL}/obj/Prod_PremiumReport_MSR?${queryString}`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error('No premium report MSR found');
+  }
+
+  return data.response.results[0];
+}
+
+export async function fetchAnyPremiumReportMSR() {
+  const url = `${API_BASE_URL}/obj/Prod_PremiumReport_MSR?limit=1`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (!data.response || !data.response.results || data.response.results.length === 0) {
+    throw new Error('No premium report MSR available');
+  }
+
   return data.response.results[0];
 }
 
